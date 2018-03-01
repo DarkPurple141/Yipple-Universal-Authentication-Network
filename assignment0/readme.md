@@ -15,7 +15,7 @@ The project is laid out as follows:
 `/flaskr/basic/`
 * This is a **blueprint**. It is like a submodule/self-contained flask application
 * We will be using blueprints like this for the various parts of your later application
-* This is the part you will be modifing today
+* This is the part you will be modifying today
 
 `/flaskr/basic/views.py`
 * This contains all the **routes**. These are the endpoints and the logic behind handling them
@@ -39,9 +39,9 @@ The project is laid out as follows:
 
 To setup, we will first create a virtual environment for python3. Much like npm (nodeJS), rvm (ruby), this will avoid polluting your global namespace.
 
-Note, please have python3.5+ installed. We will be testing on python3, not python2. There are compatability differences. If you insist on writing in python2, do note we will not provide any support for unit-testing/auto-marking python2, and you may fail the weekly assignments as result.
+Note, please have python3.5+ installed. We will be testing on python3, not python2. There are compatibility differences. If you insist on writing in python2, do note we will not provide any support for unit-testing/auto-marking python2, and you may fail the weekly assignments as result.
 
-These instructions presume you're using a *nix based OS. We provide minimal support for Windows, but it should be largely the same assuming you have Python in your PATH.
+These instructions presume you're using a \*nix based OS. We provide minimal support for Windows, but it should be largely the same assuming you have Python in your PATH.
 
 ```
 virtualenv env
