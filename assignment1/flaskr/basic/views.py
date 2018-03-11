@@ -9,7 +9,11 @@ def home():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        # Implement me
+        # TODO
+        user = request.form.get('username')
+        pw   = request.form.get('password')
+        print(user, pw)
+        session['username'] = request.data
         return "login request received", 400
 
     return render_template("login.html")
@@ -23,13 +27,25 @@ def logout():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Implement me
-        return "register request received", 400
+        # TODO
+        print (request.data)
+        data = request.body
+        user = data.username
+        pw = data.password
+
+        if user and pw:
+            if registerUser(user, pw) == 200:
+                return redirect('/login')
+            else:
+                return "Username is taken, Soz.", 400
+
+        return "Registration Error occurred", 500
 
     return render_template("register.html")
 
 @app.route('/users/<account>')
 def users(account):
-    # Implement me
-
-    return render_template("users.html")
+    # TODO
+    if 'user' not in session:
+        return 400
+    return render_template("users.html", account=account)

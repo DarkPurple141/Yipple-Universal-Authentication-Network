@@ -1,3 +1,5 @@
+#!/bin/env/python3.5
+
 import os
 import json
 import bcrypt
@@ -19,10 +21,15 @@ class KomradeConfig:
 
 def registerUser(username, password):
     komrade = KomradeConfig("user")
-    
-    # Implement me
 
-    return None
+    data = komrade.read()
+
+    # if user already exists do x
+    if username in data:
+        return 400 # ????
+        # else proceed as normal
+
+    return 200
 
 def validateUser(username, password):
     komrade = KomradeConfig("user")
