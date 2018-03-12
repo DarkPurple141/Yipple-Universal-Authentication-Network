@@ -5,7 +5,6 @@ from .. import models
 
 def getFormData(request):
     data = request.form
-    print(data)
     user = data.get('username')
     pw = data.get('password')
 
@@ -39,7 +38,6 @@ def login():
 @app.route('/logout', methods=["GET"])
 def logout():
     session.clear()
-
     return redirect(url_for("basic.home"))
 
 @app.route('/register', methods=["GET", "POST"])
@@ -54,7 +52,6 @@ def register():
                 else:
                     return "Username is taken, Soz.", 400
         except Exception as e:
-            print(e)
             return "Server Error", 500
 
     # occurs if get request
@@ -65,4 +62,4 @@ def users(account):
     # TODO
     if 'username' not in session and not session['username']:
         return 400
-    return render_template("users.html", account=account)
+    return render_template("users.html", account=session['username'])

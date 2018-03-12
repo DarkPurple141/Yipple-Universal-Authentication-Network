@@ -46,7 +46,6 @@ def registerUser(username, password):
         except Exception as e:
             print(e)
         """
-        print("HERE")
         data[username] = {
             'password': password,
             'id'      : str(uuid.uuid4())
@@ -66,7 +65,7 @@ def validateUser(username, password):
     data = komrade.read()
     # bcrypt.checkpw('Jeff'.encode('utf-8'),)
 
-    if username in data:
+    if username in data and data[username]['password'] == password:
         return True
 
     return False
