@@ -29,7 +29,7 @@ def login():
 
         if user and pw and models.validateUser(user, pw):
             session['username'] = user
-            return redirect('/users/{}'.format(user))
+            return redirect('/users/me') # {}'.format(user))
         else:
             return "You shall not pass.", 403
 
@@ -63,3 +63,7 @@ def users(account):
     if 'username' not in session and not session['username']:
         return 400
     return render_template("users.html", account=session['username'])
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("error.html"), 404

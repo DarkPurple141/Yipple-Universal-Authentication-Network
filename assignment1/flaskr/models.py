@@ -37,17 +37,8 @@ def registerUser(username, password):
         return 400 # ????
     # else proceed as normal for valid registration
     else:
-        """
-        try:
-            data[username] = {
-                'password': bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
-                'id'      : uuid.uuid4()
-            }
-        except Exception as e:
-            print(e)
-        """
         data[username] = {
-            'password': password,
+            'password': bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
             'id'      : str(uuid.uuid4())
         }
         komrade.write(data)
@@ -58,14 +49,13 @@ def registerUser(username, password):
 def validateUser(username, password):
     """
     Checks whether {username} is valid.
-    pw_hash = bcrypt.generate_password_hash(‘hunter2’).decode(‘utf-8’)
-    bcrypt.check_password_hash(pw_hash, 'hunter2')
     """
     komrade = KomradeConfig("user")
     data = komrade.read()
-    # bcrypt.checkpw('Jeff'.encode('utf-8'),)
 
-    if username in data and data[username]['password'] == password:
-        return True
+    if username not in data:
+        return False
 
-    return False
+    hashedpw = data[username]['password'].encode('utf-8')
+
+    return bcrypt.checkpw(password.encode('utf-8'), hashedpw)
