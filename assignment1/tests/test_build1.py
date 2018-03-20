@@ -21,6 +21,10 @@ class TestApp:
         res = client.post('/login', data=register_data)
         assert 'username' in session
 
+    def test_login_no_data(self, client):
+        res = client.post('/login', data={})
+        assert res.status_code == 403
+
     def test_login_fail_no_user(self, client):
         res = client.post('/login', data={'username': 'i_should_not_login', 'password': 'helloworld'})
         assert 'username' not in session
