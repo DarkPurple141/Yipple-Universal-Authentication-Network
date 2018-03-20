@@ -30,6 +30,7 @@ def registerUser(username, password):
     """
     komrade = KomradeConfig("user")
 
+<<<<<<< HEAD
     data = komrade.read()
 
     # if user already exists do x
@@ -45,6 +46,16 @@ def registerUser(username, password):
 
     return 200
 
+=======
+    user_store = komrade.read()
+    if username in user_store:
+        raise NameError("User already exists in database")
+
+    pw_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    user_store[username] = pw_hash.decode('utf-8')
+
+    komrade.write(user_store)
+>>>>>>> 1f60d8aa29eb47065190f8c5fd225cd2e26063b4
 
 def validateUser(username, password):
     """
@@ -56,6 +67,16 @@ def validateUser(username, password):
     if username not in data:
         return False
 
+<<<<<<< HEAD
     hashedpw = data[username]['password'].encode('utf-8')
 
     return bcrypt.checkpw(password.encode('utf-8'), hashedpw)
+=======
+    user_store = komrade.read()
+    if not username in user_store:
+        return False
+
+    stored_pw = user_store[username].encode('utf-8')
+
+    return bcrypt.hashpw(password.encode('utf-8'), stored_pw) == stored_pw 
+>>>>>>> 1f60d8aa29eb47065190f8c5fd225cd2e26063b4
