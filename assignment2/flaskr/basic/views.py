@@ -106,7 +106,11 @@ def admin():
         # as well as regular users.
         # It should also be able to search for a user via a get parameter called user.
         searchedUser = request.args.get('user')
-        response = render_template("admin.html", user=searchedUser)
+
+        if len(searchedUser):
+            query = models.searchDB(searchedUser)
+
+        response = render_template("admin.html", user=query, username=searchedUser)
 
     elif request.method == 'POST':
         # TODO: You must also implement a post method in order update a searched users credentials.
@@ -115,7 +119,3 @@ def admin():
         response = render_template("admin.html")
 
     return response
-
-
-
-

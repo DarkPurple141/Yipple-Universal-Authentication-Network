@@ -21,26 +21,32 @@ to edit and update the credentials of any given KomradeBank account.
     {% if user %}
     <table class="table">
         <thead>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Emaik</th>
-            <th>Phone</th>
-            <th>Current Funds</th>
+           {% for field in user %}
+             <th>{{ field | capitalize }}</th>
+            {% endfor %}
         </thead>
         <!-- IMPLEMENT ME -->
         <tbody>
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+               {% for field in user %}
+                <td>{{ user[field] }}</td>
+               {% endfor %}
             </tr>
         </tbody>
     </table>
 
-    <h3>Edit credentials for {{ user }} </h3>
-    <form><!-- IMPLEMENT ME --></form>
+    <h3>Edit credentials for {{ username }} </h3>
+    <form>
+      {% for key in user %}
+      <div class="mb-3">
+        <label for="{{key}}">{{key | capitalize }}</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="{{key}}" value="{{ user[key] }}" required="">
+        </div>
+      </div>
+      {% endfor %}
+      <input type="submit" class="btn btn-success" value="Submit"></input>
+   </form>
 
     {% else %}
     <p>Search for a user to edit their credentials</p>

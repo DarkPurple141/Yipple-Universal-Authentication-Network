@@ -2,7 +2,24 @@ import os
 import json
 import bcrypt
 import uuid
-import db
+from . import db
+
+def searchDB(username):
+    result = None
+    query = db.queryDB('SELECT name, address, email, phonenum, funds FROM creds \
+                       JOIN users WHERE username = ?', [username], one=True)
+
+    if query:
+        result = {
+            'name':       query[0],
+            'address':    query[1],
+            'email':      query[2],
+            'phone':      query[3],
+            'funds':      query[4]
+        }
+
+    return result
+
 
 def registerUser(username, password):
     isSuccess = False

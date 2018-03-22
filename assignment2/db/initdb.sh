@@ -14,4 +14,4 @@ then
 fi
 
 cat userSchema.sql | sqlite3 ../users.db && echo "Created ../users.db"
-cat credSchema.sql | sqlite3 ../creds.db && echo "Created ../creds.db"
+#cat credSchema.sql | sqlite3 ../creds.db && echo "Created ../creds.db"
