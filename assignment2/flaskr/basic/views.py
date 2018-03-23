@@ -79,20 +79,26 @@ def users(account):
 
     if username == 'me':
         if 'username' in session:
-            response = render_template("users.html", username=username)
+            username = session['username']
+            # valid me session
+            query = models.searchDB(username) # no check req'd.
+            response = render_template("users.html", username=username, query=query, search=username)
+        else:
+            return render_template("users.html", username=None), 403
+
 
     # TODO: Implement the ability to edit and view credentials for
     # the creds database.
     if request.method == 'GET':
         # TODO: Display credentials if user belongs to current session, or if user is admin.
         # Deny access otherwise and display '404 not found' on the page
-        response = render_template("users.html", username=username)
+        response = render_template("users.html", username=username, query=username, search=username)
     else:
         # TODO: Update The Credentials
         # Two types of users can edit credentials for <account>
         # 1. Regular Users that have sessions == <account>
         # 2. Administrators.
-        response = render_template("users.html", username=username)
+        response = render_template("users.html", username=username, query=username, search=username)
 
     return response
 
@@ -106,11 +112,12 @@ def admin():
         # as well as regular users.
         # It should also be able to search for a user via a get parameter called user.
         searchedUser = request.args.get('user')
+        query = None
 
-        if len(searchedUser):
+        if searchedUser:
             query = models.searchDB(searchedUser)
 
-        response = render_template("admin.html", user=query, username=searchedUser)
+        response = render_template("admin.html", query=query, username="admin", search=searchedUser)
 
     elif request.method == 'POST':
         # TODO: You must also implement a post method in order update a searched users credentials.

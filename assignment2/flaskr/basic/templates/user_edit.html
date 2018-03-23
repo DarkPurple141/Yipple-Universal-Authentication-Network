@@ -1,0 +1,13 @@
+{% block content %}
+<form>
+  {% for key in query %}
+  <div class="mb-3">
+    <label for="{{key}}">{{key | capitalize }}</label>
+    <div class="input-group">
+      <input type="text" class="form-control" id="{{key}}" value="{{ query[key] }}" required="">
+    </div>
+  </div>
+  {% endfor %}
+  <input type="submit" class="btn btn-success" value="Submit"></input>
+</form>
+{% endblock %}

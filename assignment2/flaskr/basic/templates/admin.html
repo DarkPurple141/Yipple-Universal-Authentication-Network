@@ -3,12 +3,20 @@
 {% block content %}
 <h1 class="mt-5">Account Administration Portal</h1>
 
-<!-- TODO: Implement the user account search -->
 <div>
     <h3>Account Search</h3>
     <p>Search for an existing user</p>
-    <!-- TODO: Implement the user search form-->
-    <form></form>
+    <form method="get">
+      <div class="col-6 mb-3">
+         <div class="input-group">
+           <input type="text" name="user" class="form-control" id="search" required="">
+         </div>
+      </div>
+      <div class="col-6 mb-3">
+         <input type="submit" class="btn btn-success" value="Search"></input>
+      </div>
+
+   </form>
 </div>
 
 <!--
@@ -18,35 +26,11 @@ to edit and update the credentials of any given KomradeBank account.
 -->
 <div>
     <h3>Searched Account Credentials</h3>
-    {% if user %}
-    <table class="table">
-        <thead>
-           {% for field in user %}
-             <th>{{ field | capitalize }}</th>
-            {% endfor %}
-        </thead>
-        <!-- IMPLEMENT ME -->
-        <tbody>
-            <tr>
-               {% for field in user %}
-                <td>{{ user[field] }}</td>
-               {% endfor %}
-            </tr>
-        </tbody>
-    </table>
+    {% if query %}
+    {% include 'user_info.html' %}
 
-    <h3>Edit credentials for {{ username }} </h3>
-    <form>
-      {% for key in user %}
-      <div class="mb-3">
-        <label for="{{key}}">{{key | capitalize }}</label>
-        <div class="input-group">
-          <input type="text" class="form-control" id="{{key}}" value="{{ user[key] }}" required="">
-        </div>
-      </div>
-      {% endfor %}
-      <input type="submit" class="btn btn-success" value="Submit"></input>
-   </form>
+    <h3>Edit credentials for {{ search }} </h3>
+    {% include 'user_edit.html' %}
 
     {% else %}
     <p>Search for a user to edit their credentials</p>

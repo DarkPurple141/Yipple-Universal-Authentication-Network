@@ -1,0 +1,17 @@
+{% block content %}
+<table class="table">
+    <thead>
+      {% for field in query %}
+         <th>{{ field | capitalize }}</th>
+        {% endfor %}
+    </thead>
+    <!-- IMPLEMENT ME -->
+    <tbody>
+        <tr>
+           {% for field in query %}
+           <td>{{ query[field] }}</td>
+           {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
