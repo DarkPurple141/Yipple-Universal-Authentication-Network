@@ -1,11 +1,12 @@
 {% block content %}
 <table class="table">
+    <!-- Presents headers for user table -->
     <thead>
       {% for field in query %}
          <th>{{ field | capitalize }}</th>
         {% endfor %}
     </thead>
-    <!-- IMPLEMENT ME -->
+    <!-- Presents info for user -->
     <tbody>
         <tr>
            {% for field in query %}

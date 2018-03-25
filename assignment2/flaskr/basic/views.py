@@ -6,6 +6,9 @@ from . import app
 from .. import models
 import os
 
+def isAuthenticated(user):
+    return 'username' in session and session['username'] == user
+
 @app.route('/')
 def home():
     username = None
@@ -82,7 +85,7 @@ def users(account):
             username = session['username']
             # valid me session
             query = models.searchDB(username) # no check req'd.
-            response = render_template("users.html", username=username, query=query, search=username)
+            return render_template("users.html", username=username, query=query, search=username)
         else:
             return render_template("users.html", username=None), 403
 
@@ -105,9 +108,10 @@ def users(account):
 @app.route('/admin')
 def admin():
     response = None
+    if not isAuthenticated('admin'):
+        return render_template('error_page.html'), 403
 
     if request.method == 'GET':
-        # TODO: Implement and secure the user administration control panel
         # The administration panel must distinguish between users that are administrators
         # as well as regular users.
         # It should also be able to search for a user via a get parameter called user.

@@ -4,22 +4,22 @@ import bcrypt
 import uuid
 from . import db
 
+validfields = ['name','address','email','phonenum','funds']
+
 def searchDB(username):
     result = None
-    query = db.queryDB('SELECT name, address, email, phonenum, funds FROM creds \
-                       JOIN users WHERE username = ?', [username], one=True)
-
+    username = '%' + username + '%'
+    query = db.queryDB('SELECT name, address, email, phonenum, funds FROM users \
+                       NATURAL JOIN creds WHERE username LIKE ?', [username], one=True)
     if query:
-        result = {
-            'name':       query[0],
-            'address':    query[1],
-            'email':      query[2],
-            'phone':      query[3],
-            'funds':      query[4]
-        }
+        for index, field in enumerate(validfields):
+            result[field] = query[index]
 
     return result
 
+def updateDB(field, value, user=None):
+    if user and field in validfields:
+        db.insertDB('UPDATE credentials SET ? = ? WHERE username = ?', (field, value, user))
 
 def registerUser(username, password):
     isSuccess = False
