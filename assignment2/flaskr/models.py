@@ -7,7 +7,7 @@ from . import db
 validfields = ['name','address','email','phonenum','funds']
 
 def searchDB(username):
-    result = None
+    result = {}
     username = '%' + username + '%'
     query = db.queryDB('SELECT name, address, email, phonenum, funds FROM users \
                        NATURAL JOIN creds WHERE username LIKE ?', [username], one=True)
@@ -17,9 +17,21 @@ def searchDB(username):
 
     return result
 
-def updateDB(field, value, user=None):
-    if user and field in validfields:
-        db.insertDB('UPDATE credentials SET ? = ? WHERE username = ?', (field, value, user))
+def updateDB(update, username):
+    res = db.queryDB('SELECT uid FROM users WHERE username = ?', [username], one=True)
+    uid = res[0]
+    data = []
+    for key in validfields:
+        data.append(update[key])
+    data.append(uid)
+    if uid >= 0 and len(data):
+        db.insertDB('UPDATE creds \
+                        SET name    = ?, \
+                            address = ?, \
+                            email   = ?, \
+                            phonenum= ?, \
+                            funds   = ?  \
+                    WHERE uid = ?', data)
 
 def registerUser(username, password):
     isSuccess = False

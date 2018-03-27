@@ -1,10 +1,10 @@
 {% block content %}
-<form>
+<form method="post">
   {% for key in query %}
   <div class="mb-3">
     <label for="{{key}}">{{key | capitalize }}</label>
     <div class="input-group">
-      <input type="text" class="form-control" id="{{key}}" value="{{ query[key] }}" required="">
+      <input type="text" class="form-control" id="{{key}}" name="{{key}}" value="{{ query[key] }}" required="">
     </div>
   </div>
   {% endfor %}

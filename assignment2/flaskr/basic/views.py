@@ -76,9 +76,11 @@ def register():
 
     return render_template("register.html")
 
-@app.route('/users/<account>')
+@app.route('/users/<account>', methods=["GET", "POST"])
 def users(account):
     username = account
+    if not isAuthenticated(username) and not isAuthenticated('admin'):
+        return render_template('error_page.html'), 404
 
     if username == 'me':
         if 'username' in session:
@@ -97,6 +99,7 @@ def users(account):
         # Deny access otherwise and display '404 not found' on the page
         response = render_template("users.html", username=username, query=username, search=username)
     else:
+        # POST
         # TODO: Update The Credentials
         # Two types of users can edit credentials for <account>
         # 1. Regular Users that have sessions == <account>
@@ -105,17 +108,18 @@ def users(account):
 
     return response
 
-@app.route('/admin')
+@app.route('/admin', methods=["GET", "POST"])
 def admin():
     response = None
     if not isAuthenticated('admin'):
         return render_template('error_page.html'), 403
 
+    searchedUser = request.args.get('user')
+
     if request.method == 'GET':
         # The administration panel must distinguish between users that are administrators
         # as well as regular users.
         # It should also be able to search for a user via a get parameter called user.
-        searchedUser = request.args.get('user')
         query = None
 
         if searchedUser:
@@ -126,7 +130,13 @@ def admin():
     elif request.method == 'POST':
         # TODO: You must also implement a post method in order update a searched users credentials.
         # It must return a page that denies a regular user
-        # access and display '403 permission denied'.
-        response = render_template("admin.html")
+        # access and display '403 permission denied'
+        update = {}
+        for key in request.form:
+            update[key] = request.form.get(key)
+
+        models.updateDB(update, searchedUser)
+
+        response = render_template("admin.html", query=update, username="admin", search=searchedUser)
 
     return response
