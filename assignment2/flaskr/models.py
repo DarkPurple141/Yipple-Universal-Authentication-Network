@@ -4,6 +4,7 @@ import bcrypt
 import uuid
 from . import db
 
+<<<<<<< HEAD
 validfields = ['name','address','email','phonenum','funds']
 
 def searchDB(username):
@@ -32,6 +33,9 @@ def updateDB(update, username):
                             phonenum= ?, \
                             funds   = ?  \
                     WHERE uid = ?', data)
+=======
+from .db import getDB, queryDB, insertDB
+>>>>>>> 94156f038df3829a42e14084aaad6ac56ffd1f26
 
 def registerUser(username, password):
     isSuccess = False

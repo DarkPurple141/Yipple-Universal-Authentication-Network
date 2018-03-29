@@ -1,11 +1,11 @@
 CREATE TABLE users(
-	uid SERIAL PRIMARY KEY,
-	username TEXT NOT NULL UNIQUE,
-	passhash TEXT NOT NULL
+    uid SERIAL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    passhash TEXT NOT NULL
 );
 
 CREATE TABLE creds(
-	 uid INTEGER,
+    uid INTEGER,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
     email TEXT NOT NULL,

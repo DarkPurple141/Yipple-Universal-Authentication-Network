@@ -12,11 +12,6 @@
 <h3>Edit your Credentials</h3>
 {% include 'user_edit.html' %}
 
-<h3>Search</h3>
-<form method="get">
-    <input type="text" name="username"></input>
-    <button type="submit" class="btn">Search</button>
-</form>
 {% else %}
 {% include 'error.html' %}
 {% endif %}
