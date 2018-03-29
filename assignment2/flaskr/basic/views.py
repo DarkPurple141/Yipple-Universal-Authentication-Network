@@ -90,7 +90,11 @@ def users(account):
             username = session['username']
             # valid me session
             query = models.searchDB(username) # no check req'd.
-            response = render_template("users.html", username=username, query=query, search=username)
+            response = render_template("users.html",
+                    loggedin = username,
+                    username = username,
+                    query    = query,
+                    search   = username)
         else:
             response = render_template("users.html", username=None), 403
     else:
@@ -101,12 +105,22 @@ def users(account):
         loggedin = session['username']
         # trying to access account if here user is auth'd
         if request.method == 'GET':
+
             query = models.searchDB(username)
-            response = render_template("users.html", username=loggedin, query=query, search=username)
+
+            response = render_template("users.html",
+                username=username,
+                loggedin=loggedin,
+                query=query,
+                search=username)
+
         elif request.method == 'POST':
+
             update = prepDBQuery()
+
             models.updateDB(update, username)
-            response = render_template("users.html", username=username, query=username, search=username)
+
+            response = render_template("users.html", username=username, loggedin=loggedin, query=update, search=loggedin)
 
     return response
 
@@ -121,13 +135,12 @@ def admin():
     if request.method == 'GET':
         # The administration panel must distinguish between users that are administrators
         # as well as regular users.
-        # It should also be able to search for a user via a get parameter called user.
         query = None
 
         if searchedUser:
             query = models.searchDB(searchedUser)
 
-        response = render_template("admin.html", query=query, username="admin", search=searchedUser)
+        response = render_template("admin.html", query=query, loggedin="admin", search=searchedUser)
 
     elif request.method == 'POST':
 
@@ -135,6 +148,6 @@ def admin():
 
         models.updateDB(update, searchedUser)
 
-        response = render_template("admin.html", query=update, username="admin", search=searchedUser)
+        response = render_template("admin.html", query=update, loggedin="admin", search=searchedUser)
 
     return response
