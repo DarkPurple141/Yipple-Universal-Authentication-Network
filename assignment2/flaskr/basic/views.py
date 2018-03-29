@@ -9,6 +9,13 @@ import os
 def isAuthenticated(user):
     return 'username' in session and session['username'] == user
 
+def prepDBQuery():
+    update = {}
+    for key in request.form:
+        update[key] = request.form.get(key)
+
+    return update
+
 @app.route('/')
 def home():
     username = None
@@ -49,7 +56,6 @@ def login():
 @app.route('/logout', methods=["GET"])
 def logout():
     session.clear()
-
     return redirect(url_for("basic.home"))
 
 @app.route('/register', methods=["GET", "POST"])
@@ -78,33 +84,29 @@ def register():
 
 @app.route('/users/<account>', methods=["GET", "POST"])
 def users(account):
-    username = account
-    if not isAuthenticated(username) and not isAuthenticated('admin'):
-        return render_template('error_page.html'), 404
 
-    if username == 'me':
+    if account == 'me':
         if 'username' in session:
             username = session['username']
             # valid me session
             query = models.searchDB(username) # no check req'd.
-            return render_template("users.html", username=username, query=query, search=username)
+            response = render_template("users.html", username=username, query=query, search=username)
         else:
-            return render_template("users.html", username=None), 403
-
-
-    # TODO: Implement the ability to edit and view credentials for
-    # the creds database.
-    if request.method == 'GET':
-        # TODO: Display credentials if user belongs to current session, or if user is admin.
-        # Deny access otherwise and display '404 not found' on the page
-        response = render_template("users.html", username=username, query=username, search=username)
+            response = render_template("users.html", username=None), 403
     else:
-        # POST
-        # TODO: Update The Credentials
-        # Two types of users can edit credentials for <account>
-        # 1. Regular Users that have sessions == <account>
-        # 2. Administrators.
-        response = render_template("users.html", username=username, query=username, search=username)
+        if not isAuthenticated(account) and not isAuthenticated('admin'):
+            return render_template('error_page.html'), 403
+
+        username = account
+        loggedin = session['username']
+        # trying to access account if here user is auth'd
+        if request.method == 'GET':
+            query = models.searchDB(username)
+            response = render_template("users.html", username=loggedin, query=query, search=username)
+        elif request.method == 'POST':
+            update = prepDBQuery()
+            models.updateDB(update, username)
+            response = render_template("users.html", username=username, query=username, search=username)
 
     return response
 
@@ -114,7 +116,7 @@ def admin():
     if not isAuthenticated('admin'):
         return render_template('error_page.html'), 403
 
-    searchedUser = request.args.get('user')
+    searchedUser = request.args.get('search')
 
     if request.method == 'GET':
         # The administration panel must distinguish between users that are administrators
@@ -128,12 +130,8 @@ def admin():
         response = render_template("admin.html", query=query, username="admin", search=searchedUser)
 
     elif request.method == 'POST':
-        # TODO: You must also implement a post method in order update a searched users credentials.
-        # It must return a page that denies a regular user
-        # access and display '403 permission denied'
-        update = {}
-        for key in request.form:
-            update[key] = request.form.get(key)
+
+        update = prepDBQuery()
 
         models.updateDB(update, searchedUser)
 

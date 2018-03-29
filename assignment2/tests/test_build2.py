@@ -29,12 +29,12 @@ import unittest
 from flaskr import app
 
 admin_data = {'username': 'admin', 'password': 'alice'}
-user_data = {'username': 'carol', 'password': '0xbeefcafebabe'}
+user_data = {'username': 'carol', 'password': '0xbe3fcafeb4b3'}
 bad_login = {'username':'badmin', 'password': 'lol'}
 
 admin_creds = {
     'name': 'Alice Administrator', \
-    'address':'Omnipotent', \
+    'address':'Omnipotence', \
     'email':'alice@alice.com', \
     'phonenum':'+313 373 8483', \
     'funds':'31333337'
@@ -44,7 +44,7 @@ carol_creds = {
     'address':'Californ-eye-ay', \
     'email':'carol@candle.lite', \
     'phonenum':'+66 666 6666', \
-    'funds':'41424344'
+    'funds':'42'
 }
 
 DENIEDSTR = b'403 permission denied'
@@ -131,7 +131,7 @@ class TestApp:
 
         res = client.post('/login', data=admin_data)
         res = client.get('/admin')
-        assert b'account search' in res.data
+        assert b'Account Search' in res.data
 
         res = client.get('/admin?search=admin')
         assert admin_creds['name'].encode('utf-8') in res.data

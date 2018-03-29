@@ -1,9 +1,8 @@
 import pytest
-import os
 
 from flaskr import create_app
 
-pytest.fixture
+@pytest.fixture
 def app():
     app = create_app()
     app.debug = True
