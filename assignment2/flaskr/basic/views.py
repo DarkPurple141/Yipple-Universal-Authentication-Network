@@ -85,16 +85,28 @@ def register():
 @app.route('/users/<account>', methods=["GET", "POST"])
 def users(account):
 
+    # TODO REFACTOR THIS HORRIBLE MESS
     if account == 'me':
         if 'username' in session:
+            # CLAGGING HACKS INCOMING
             username = session['username']
-            # valid me session
-            query = models.searchDB(username) # no check req'd.
-            response = render_template("users.html",
-                    loggedin = username,
-                    username = username,
-                    query    = query,
-                    search   = username)
+            if request.method == 'GET':
+                # valid me session
+                query = models.searchDB(username) # no check req'd.
+                response = render_template("users.html",
+                        loggedin = username,
+                        username = username,
+                        query    = query,
+                        search   = username)
+            elif request.method == 'POST':
+                update = prepDBQuery()
+
+                if username != update['username']:
+                    response = render_template("users.html", username=None), 403
+                else:
+                    models.updateDB(update, username)
+                    response = render_template("users.html", username=username, loggedin=username, query=update, search=username)
+
         else:
             response = render_template("users.html", username=None), 403
     else:
@@ -145,6 +157,8 @@ def admin():
     elif request.method == 'POST':
 
         update = prepDBQuery()
+        if not searchedUser:
+            searchedUser = update['username']
 
         models.updateDB(update, searchedUser)
 
