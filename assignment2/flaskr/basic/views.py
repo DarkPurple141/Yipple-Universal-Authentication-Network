@@ -142,7 +142,7 @@ def admin():
     if not isAuthenticated('admin'):
         return render_template('error_page.html'), 403
 
-    searchedUser = request.args.get('search')
+    searchedUser = request.args.get('user')
 
     if request.method == 'GET':
         # The administration panel must distinguish between users that are administrators
