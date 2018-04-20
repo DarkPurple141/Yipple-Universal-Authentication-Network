@@ -23,9 +23,6 @@ def home():
 """
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    if 'username' in session:
-        return redirect(url_for("basic.users", account="me"))
-
     if request.method == "POST":
         # TODO
         user, pw = getFormData(request)
