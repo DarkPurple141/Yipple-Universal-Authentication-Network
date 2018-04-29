@@ -147,7 +147,7 @@ class User:
 
     def update(self):
         db.execute('''
-          UPDATE users 
+          UPDATE users
           SET user_role = ?,
               user_pass = ?,
               user_fullname = ?,
@@ -207,6 +207,15 @@ class User:
 
 class Acct:
 
+    """
+        CREATE TABLE accts (
+          acct_id TEXT NOT NULL PRIMARY KEY,
+          acct_user INTEGER NOT NULL,
+          acct_balance NUMERIC NOT NULL DEFAULT 0.00,
+          FOREIGN KEY (acct_user) REFERENCES users(user_id)
+        );
+    """
+
     def __init__(self, id, user, balance):
         self.id = id
         self.user = user
@@ -223,21 +232,21 @@ class Acct:
     @staticmethod
     def new(user_id):
         id = str(uuid.uuid4())
-        db.execute('-- TODO: write SQL query to insert new account with provided account id and user id', [id, user_id])
+        db.execute('INSERT INTO accts (acct_id,  acct_user) VALUES (?, ?)', [id, user_id])
         Xact.new(id, 'starting balance', 0.00)
         do_transfer(Acct.by_user_id(1)[0].id, id, 1337.00, 'KomradeBank New Account Bonus Offer')
         return id
 
     @staticmethod
     def by_id(acct_id):
-        row = db.get('-- TODO: write SQL query to return a single row for a specific account id', [acct_id])
+        row = db.get('SELECT * FROM accts where acct_id = ?', [acct_id])
         if row is None:
             return None
         return Acct._from_row(row)
 
     @staticmethod
     def by_user_id(user_id):
-        rows = db.select('-- TODO: write SQL query to return all rows for a specified user id', [user_id])
+        rows = db.select('SELECT * FROM accts where acct_user = ?', [user_id])
         accts = []
         for row in rows:
             accts.append(Acct._from_row(row))
@@ -245,7 +254,7 @@ class Acct:
 
     @staticmethod
     def by_filter(filter):
-        rows = db.select('-- TODO: write SQL query to return all rows where account id matches a LIKE filter', ['%' + filter + '%'])
+        rows = db.select('SELECT * FROM accts where acct_id LIKE ?', ['%' + filter + '%'])
         accts = []
         for row in rows:
             accts.append(Acct._from_row(row))
@@ -253,6 +262,16 @@ class Acct:
 
 
 class Xact:
+    """
+    CREATE TABLE xacts (
+      xact_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      xact_acct TEXT NOT NULL,
+      xact_amount INTEGER NOT NULL DEFAULT 0.00,
+      xact_memo TEXT NOT NULL DEFAULT '',
+      xact_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (xact_acct) REFERENCES accts(acct_id)
+    );
+    """
 
     def __init__(self, id, timestamp, acct, memo, amount):
         self.id = id
@@ -273,38 +292,40 @@ class Xact:
 
     @staticmethod
     def new(acct_id, memo, amount):
-
-        # TODO: Implement method to create new transaction.
-
-        # Returns id for the newly inserted transaction. (provided by db.execute())
-        return -1
+        id = db.execute('INSERT INTO xacts (xact_amount, xact_memo, xact_acct) VALUES (?, ?, ?)', [amount, memo, acct_id])
+        return id
 
     @staticmethod
     def by_id(xact_id):
-
-        # TODO: Implement method to return the transaction for a given id.
-
-        # Returns Xact object
-        return None
+        row = db.get('SELECT * FROM xacts WHERE xact_id = ?', [xact_id])
+        if row is None:
+            return None
+        return Xact._from_row(row)
 
     @staticmethod
     def by_acct_id(acct_id):
-
-        # TODO: Implement method to return list of all transactions for a given account id.
+        # Method to return list of all transactions for a given account id.
         # SQL query should be ordered so the most recent transaction (by id) is first i.e. index 0.
-        
-        # Returns list of Xact objects
-        return []
+        rows = db.select('SELECT * FROM xacts WHERE xact_acct = ? order by xact_id DESC', [acct_id])
+        transactions = []
+        for row in rows:
+            transactions.append(Xact._from_row(row))
+        return transactions
 
     @staticmethod
     def by_filter(filter):
-
-        # TODO: Implement method to return list of all transactions where 'xact_memo' matches a LIKE filter.
+        # Method to return list of all transactions where 'xact_memo' matches a LIKE filter.
         # SQL query should be ordered so the most recent transaction (by id) is first i.e. index 0.
+        rows = db.select('SELECT * FROM xacts where xact_memo LIKE ? order by xact_id DESC', ['%' + filter + '%'])
+        transactions = []
+        for row in rows:
+            transactions.append(Xact._from_row(row))
+        return transactions
 
-        # Returns list of Xact objects
-        return []
 
+def different_accounts(src, dest):
+    """takes in two SQL rows and checks whether they're the same"""
+    return src.id != dest.id
 
 def do_transfer(src, dst, amount, memo):
 
@@ -322,19 +343,21 @@ def do_transfer(src, dst, amount, memo):
       b) Amount must be greater than zero.
       c) Source account must have sufficient funds for transfer.
     """
+    if not(src_acct and dst_acct and different_accounts(src_acct, dst_acct)):
+        return "Transfer Failed - Invalid Accounts."
 
-    # return "Transfer Failed - Invalid Accounts."
+    if not amount or amount <= 0:
+        return "Transfer Failed - Invalid amount."
 
-    # return "Transfer Failed - Invalid amount."
+    if src_acct.balance < amount:
+        return "Transfer Failed - Insufficient funds."
 
-    # return "Transfer Failed - Insufficient funds."
-
-
+    # strange to write this again when we have sql in the abvoe static methods
     sql = [
-        '-- TODO: write SQL query to insert new transaction for source account',
-        '-- TODO: write SQL query to insert new transaction for destination account',
-        '-- TODO: write SQL query to update source account balance',
-        '-- TODO: write SQL query to update destination account balance',
+        'INSERT INTO xacts (xact_amount, xact_memo, xact_acct) VALUES ({}, \"{}\", \"{}\")'.format(amount, memo, src_acct.id),
+        'INSERT INTO xacts (xact_amount, xact_memo, xact_acct) VALUES ({}, \"{}\", \"{}\")'.format(amount, memo, dst_acct.id),
+        'UPDATE accts SET acct_balance = {} WHERE acct_id = \"{}\"'.format(src_acct.balance - amount , src_acct.id),
+        'UPDATE accts SET acct_balance = {} WHERE acct_id = \"{}\"'.format(dst_acct.balance + amount , dst_acct.id)
     ]
 
     if not db.transaction(sql):
